@@ -1,6 +1,7 @@
 const predictClassification = require('../services/inferenceService');
 const crypto = require('crypto');
-const storeData = require('../services/storeData');
+const {storeData, getAllData} = require('../services/storeData');
+const Hapi = require('@hapi/hapi');
  
 async function postPredictHandler(request, h) {
   const { image } = request.payload;
@@ -27,5 +28,20 @@ async function postPredictHandler(request, h) {
   response.code(201);
   return response;
 }
+
+async function allHistories(req, h) {
+  try {
+    const allData = await getAllData();
+    const response = h.response({
+      status: 'success',
+      data: allData,
+    })
+    response.code(200);
+    return response;
+  } catch (error) {
+    console.error('Error:', error);
+    return h.response({ message: 'Terjadi kesalahan saat mengambil data.' }).code(500);
+  }
+}
  
-module.exports = postPredictHandler;
+module.exports = {postPredictHandler, allHistories};
